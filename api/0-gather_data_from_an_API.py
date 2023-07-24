@@ -39,7 +39,6 @@ def print_employee_tasks(employeeName, completedTasks, totalTasks):
     for task in completedTasks:
         print("\t {}".format(task.get("title")))
 
-
 if __name__ == "__main__":
     employee_id = sys.argv[1]
     tasks = get_employee_todos(employee_id)

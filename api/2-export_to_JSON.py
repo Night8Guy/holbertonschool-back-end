@@ -37,7 +37,7 @@ def export_to_json(employeeId, employeeName, completedTasks):
 
     for task in completedTasks:
         task_dict = {"task": task.get("title"),
-                     "completed": task.get("completed"),
+                    "completed": task.get("completed"),
                     "username": employeeName}
         data_dict[str(employeeId)].append(task_dict)
 
