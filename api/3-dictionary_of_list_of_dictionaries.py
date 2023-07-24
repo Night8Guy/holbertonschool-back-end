@@ -1,35 +1,37 @@
 #!/usr/bin/python3
-"""Python script that uses employee IDs,
-along with this API, to return info 
-on their TODO list progress."""
-
+"""
+Export API data to CSV format
+Format: "USER_ID","USERNAME","TASK_COMPLETED_STATUS","TASK_TITLE"
+Filename: USER_ID.csv
+all tasks from all employees
+"""
 import json
 import requests
-
-url = "https://jsonplaceholder.typicode.com"
-
-
-def get_employee_todos(employee_id):
-    """gets the employye tasks"""
-    url_todos = f"{url}/users/{employee_id}/todos"
-    todos = requests.get(url_todos)
-    return todos.json()
+import sys
 
 
-def get_employee_name(employee_id):
-    """gets the employee name"""
-    url_name = f"{url}/users/{employee_id}"
-    user_data = requests.get(url_name).json()
-    employee_name = user_data.get("username")
-    return employee_name
+def get_employee_tasks(employeeId):
+    """Get the tasks of an employee"""
+    url = "https://jsonplaceholder.typicode.com/users/{}/todos"\
+        .format(employeeId)
+    response = requests.get(url)
+    return response.json()
 
 
-def all_employees():
+def get_employee_name(employeeId):
+    """Get the name of an employee by adding the employeeId to the URL"""
+    url = "https://jsonplaceholder.typicode.com/users/{}".format(employeeId)
+    response = requests.get(url)
+    return response.json().get("username")
+
+
+def export_all_to_json():
     data_dict = {}
 
-    for employee_id in range(1, 11):
-        tasks = get_employee_todos(employee_id)
-        employeeName = get_employee_name(employee_id)
+    # Fetch tasks for all employees and organize in the desired format
+    for employeeId in range(1, 11):  # Assuming employee IDs range from 1 to 10
+        tasks = get_employee_tasks(employeeId)
+        employeeName = get_employee_name(employeeId)
 
         employee_data = []
         for task in tasks:
@@ -40,13 +42,14 @@ def all_employees():
             }
             employee_data.append(task_data)
 
-        data_dict[str(employee_id)] = employee_data
+        data_dict[str(employeeId)] = employee_data
 
     json_data = json.dumps(data_dict)
+
     filename = "todo_all_employees.json"
     with open(filename, "w") as jsonfile:
         jsonfile.write(json_data)
 
 
 if __name__ == "__main__":
-    all_employees()
+    export_all_to_json()

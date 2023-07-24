@@ -1,31 +1,34 @@
 #!/usr/bin/python3
-"""Script that gets info about the user 
-from an API"""
-
+"""
+Export API data to CSV format
+Format: "USER_ID","USERNAME","TASK_COMPLETED_STATUS","TASK_TITLE"
+Filename: USER_ID.csv
+"""
+import csv
 import json
 import requests
 import sys
-
-url = "https://jsonplaceholder.typicode.com"
-
-
-def get_employee_todos(employee_id):
-    """gets employye tasks"""
-    url_todos = f"{url}/users/{employee_id}/todos"
-    todos = requests.get(url_todos)
-    return todos.json()
+import urllib.request
 
 
-def get_employee_name(employee_id):
-    """gets  employee name"""
-    url_name = f"{url}/users/{employee_id}"
-    user_data = requests.get(url_name).json()
-    employee_name = user_data.get("username")
-    return employee_name
+def get_employee_tasks(employeeId):
+    """Get the tasks of an employee"""
+    url = "https://jsonplaceholder.typicode.com/"
+    url += "users/{}/todos".format(employeeId)
+    response = requests.get(url)
+    return response.json()
+
+
+def get_employee_name(employeeId):
+    """Get the name of an employee by adding the employeeId to the URL"""
+    url = "https://jsonplaceholder.typicode.com/"
+    url += "users/{}".format(employeeId)
+    response = requests.get(url)
+    return response.json().get("username")
 
 
 def print_employee_tasks(employeeName, completedTasks, totalTasks):
-    """prints employee tasks"""
+    """Print the tasks of an employee"""
     print("Employee {} is done with tasks({}/{}):"
           .format(employeeName, len(completedTasks), totalTasks))
     for task in completedTasks:
@@ -37,8 +40,8 @@ def export_to_json(employeeId, employeeName, completedTasks):
 
     for task in completedTasks:
         task_dict = {"task": task.get("title"),
-                    "completed": task.get("completed"),
-                    "username": employeeName}
+                     "completed": task.get("completed"),
+                     "username": employeeName}
         data_dict[str(employeeId)].append(task_dict)
 
     json_data = json.dumps(data_dict)
@@ -49,7 +52,7 @@ def export_to_json(employeeId, employeeName, completedTasks):
 
 
 if __name__ == "__main__":
-    employee_id = sys.argv[1]
-    tasks = get_employee_todos(employee_id)
-    employeeName = get_employee_name(employee_id)
-    export_to_json(employee_id, employeeName, tasks)
+    employeeId = sys.argv[1]
+    tasks = get_employee_tasks(employeeId)
+    employeeName = get_employee_name(employeeId)
+    export_to_json(employeeId, employeeName, tasks)
